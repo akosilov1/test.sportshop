@@ -1,0 +1,43 @@
+<pre><?php
+if(!$db = new mysqli("localhost","cc54877_test","TRxkm3Z9","cc54877_test"))
+	echo $db->error;
+else
+	echo "ok";
+
+$f = fopen("bishop_category_descriptions.csv", 'r');
+$i = 1;$ar_title =[];
+while ($rez = fgetcsv($f, 0,"^")) {
+	if($i == 1){
+		$ar_title = $rez;
+		print_r($ar_title);
+		$i++;
+		continue;
+	} 
+	//updateCat($rez);
+	getCat($rez);
+	//if($i>15) break;
+	$i++;
+}
+/*
+    [0] => ?category
+    [1] => description
+    [2] => meta_keywords
+    [3] => meta_description
+    [4] => page_title
+*/
+function updateCat($data){
+	global $db;
+	$qi = "UPDATE bishop_category_descriptions SET description=?,meta_keywords=?,meta_description=?,page_title=? WHERE category=?";
+	$stmt = $db->prepare($qi);
+	$stmt->bind_param("sssss",$data[1],$data[2],$data[3],$data[4],$data[0]);
+	$stmt->execute();
+	$stmt->close();
+}
+function getCat($data){
+	global $db;
+	$q="SELECT * FROM bishop_category_descriptions WHERE category='".$data[0]."' ORDER BY category_id";
+	$res = $db->query($q);
+	if ( $rez = $res->fetch_assoc()) {
+		print_r($rez);
+	}
+}
